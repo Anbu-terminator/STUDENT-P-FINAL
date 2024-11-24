@@ -81,7 +81,7 @@ app.post('/login', async (req, res) => {
         const user = await User.findOne({ email, password });
         if (user) {
             req.session.userId = user._id; // Now this should work
-            res.redirect('https://final-admin-abi9.onrender.com/');
+            res.redirect('https://final-admin-0oip.onrender.com/');
         } else {
             res.send('Invalid credentials. Please try again.');
         }
