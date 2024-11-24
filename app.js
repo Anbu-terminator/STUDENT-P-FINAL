@@ -5,6 +5,7 @@ const path = require("path");
 const session = require("express-session"); // Import express-session
 const app = express();
 
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public")); // Serve static files
@@ -95,6 +96,24 @@ app.get("/", (req, res) => {
     res.render("login");
 });
 
+// Handle login submission (User login)
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await User.findOne({ email, password });
+        if (user) {
+            req.session.userId = user._id; // This should now work without error
+            return res.redirect("https://vlgeadmin1.onrender.com/");
+        }
+
+        res.send("Invalid login details!");
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).send("An error occurred. Please try again.");
+    }
+});
+
 app.post("/login1", async (req, res) => {
     const { email, DateofBirth } = req.body;
 
@@ -138,7 +157,6 @@ app.get("/fees", async (req, res) => {
         res.send("Server error.");
     }
 });
-
 // Schemas
 const attendanceSchema = new mongoose.Schema({
     email: String,
@@ -178,14 +196,13 @@ const Attendance = mongoose.model("Attendance", attendanceSchema);
 const CourseOverview = mongoose.model("CourseOverview", courseOverviewSchema);
 const CourseStatus = mongoose.model("CourseStatus", courseStatusSchema);
 const Progress = mongoose.model("Progress", progressSchema);
-
 app.get('/profile', (req, res) => {
     res.render('profile');
 });
-
 // Routes for courses and attendance
 app.get("/attendanceManagement", async (req, res) => {
     const { email } = req.query;
+
 
     try {
         const data = await Attendance.findOne({ email });
@@ -202,6 +219,7 @@ app.get("/attendanceManagement", async (req, res) => {
 app.get("/courseOverview", async (req, res) => {
     const { email } = req.query;
 
+
     try {
         const data = await CourseOverview.findOne({ email });
         if (!data) {
@@ -216,6 +234,7 @@ app.get("/courseOverview", async (req, res) => {
 
 app.get("/courseStatus", async (req, res) => {
     const { email } = req.query;
+
 
     try {
         const data = await CourseStatus.findOne({ email });
